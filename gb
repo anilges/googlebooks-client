@@ -1,0 +1,82 @@
+#!/bin/python3
+
+import json
+import argparse
+
+from urllib.request import urlopen
+
+__title__ = "gbclient"
+__version__ = 0.1
+
+
+def argparser():
+    """Parses command line options and returns an args object"""
+    parser = argparse.ArgumentParser(description=__title__)
+    parser.add_argument(
+        '-v',
+        help="Displays the currently installed " "version of gb", action="version",
+        version=f"{__title__} v{__version__}",
+    )
+    # parser.add_argument(
+    #     '--configure', action='store_true', help='Configure gb client with credentials'
+    # )
+    # parser.add_argument(
+    #     '--get-work', action='store_true', help='Get a work by --title, --olid'
+    # )
+    # parser.add_argument(
+    #     '--get-author-works',
+    #     action='store_true',
+    #     help='Get a works of an author providing author\'s --olid, --author-name ',
+    # )
+    parser.add_argument(
+        '--get-book', action='store_true', help='Get a book by --isbn, --olid'
+    )
+    # parser.add_argument(
+    #     '--get-olid', action='store_true', help='Get an olid by --title or --isbn'
+    # )
+    # parser.add_argument('--olid', default=None,
+    #                     help="Specify an olid as an argument")
+    parser.add_argument('--isbn', default=None,
+                        help="Specify an isbn as an argument")
+    # parser.add_argument('--create', default='',
+    #                     help='Create a new work from json')
+    # parser.add_argument('--title', default=None,
+    #                     help="Specify a title as an argument")
+    # parser.add_argument(
+    #     '--author-name', default=None, help="Specify an author as an argument"
+    # )
+    # parser.add_argument(
+    #     '--baseurl', default='https://openlibrary.org', help="Which OL backend to use"
+    # )
+    # parser.add_argument(
+    #     '--email',
+    #     default=None,
+    #     help="An IA email for requests which "
+    #     "require authentication. You will be prompted "
+    #     "discretely for a password",
+    # )
+
+    # --create : to create a book (e.g. --title, --author, --isbn, ...)
+    # --edit : to edit an OL book (e.g. --olid OLXXXXX, ...)
+    return parser
+
+
+while True:
+
+    api = "https://www.googleapis.com/books/v1/volumes?q=isbn:"
+    isbn = input("Enter 10 digit ISBN: ").strip()
+
+    resp = urlopen(api + isbn)
+    book_data = json.load(resp)
+
+    volume_info = book_data["items"][0]["volumeInfo"]
+    author = volume_info["authors"]
+    prettify_author = author if len(author) > 1 else author[0]
+
+    print(f"\nTitle: {volume_info['title']}")
+    print(f"Author: {prettify_author}")
+    print(f"Page Count: {volume_info['pageCount']}")
+    print(f"Publication Date: {volume_info['publishedDate']}")
+    print("\n***\n")
+
+    break
